@@ -20,6 +20,10 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Configurar diretório de trabalho
 WORKDIR /var/www
 
+RUN mkdir -p /var/www/html/storage/logs && \
+    chown -R www-data:www-data /var/www/html/storage && \
+    chmod -R 775 /var/www/html/storage
+
 # Copiar arquivos para o contêiner
 COPY . .
 
