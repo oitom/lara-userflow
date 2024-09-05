@@ -5,9 +5,10 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Illuminate\Validation\Rule;
 
 class User extends Authenticatable
-{
+  {
   use SoftDeletes;
   /**
    * The attributes that are mass assignable.
@@ -15,17 +16,37 @@ class User extends Authenticatable
    * @var array<int, string>
    */
   protected $fillable = [
-    'nome', 'cpf', 'data_nascimento', 'email', 'telefone', 'cep', 'estado', 'cidade', 'bairro', 'endereco', 'numero'
+    'nome',
+    'cpf',
+    'data_nascimento',
+    'email',
+    'telefone',
+    'cep',
+    'estado',
+    'cidade',
+    'bairro',
+    'endereco',
+    'numero',
   ];
 
   // Método para retornar as regras de validação
-  public static function rules()
+  public static function rules($id = null)
   {
     return [
       'nome' => 'required|string|max:255',
-      'cpf' => 'required|string|max:14|unique:users',
+      'cpf' => [
+        'required',
+        'string',
+        'max:14',
+        Rule::unique('users')->ignore($id),
+      ],
       'data_nascimento' => 'required|string',
-      'email' => 'required|email|max:255|unique:users',
+      'email' => [
+        'required',
+        'email',
+        'max:255',
+        Rule::unique('users')->ignore($id),
+      ],
       'telefone' => 'required|string|max:15',
       'cep' => 'required|string|max:9',
       'estado' => 'required|string|max:2',
@@ -37,9 +58,9 @@ class User extends Authenticatable
   }
 
   public static function transformDate($date)
-  {
+    {
     return Carbon::createFromFormat('d/m/Y', $date)->format('Y-m-d');
-  }
+    }
   /**
    * The attributes that should be cast.
    *

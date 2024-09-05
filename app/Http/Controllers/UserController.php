@@ -7,9 +7,21 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-  public function index()
-    {
-    $users = User::all();
+  public function index(Request $request)
+  {
+    $query = $request->get('search');
+    $users = User::query()
+      ->when($query, function ($query, $search) {
+        return $query->where('nome', 'like', "%{$search}%")
+          ->orWhere('cpf', 'like', "%{$search}%")
+          ->orWhere('email', 'like', "%{$search}%");
+        })
+      ->get();
+
+    if ($request->ajax()) {
+      return view('users.table', compact('users'));
+    }
+
     return view('users.index', compact('users'));
   }
 
@@ -29,20 +41,7 @@ class UserController extends Controller
   {
     try {
       $request->validate(User::rules());
-
-      $dadosUsuario = [
-        'nome' => $request->nome,
-        'cpf' => $request->cpf,
-        'data_nascimento' => User::transformDate($request->data_nascimento),
-        'email' => $request->email,
-        'telefone' => $request->telefone,
-        'cep' => $request->cep,
-        'estado' => $request->estado,
-        'cidade' => $request->cidade,
-        'bairro' => $request->bairro,
-        'endereco' => $request->endereco,
-        'numero' => $request->numero,
-      ];
+      $dadosUsuario = $this->getUserDados($request);
       User::create($dadosUsuario);
 
       return redirect()->route('users.index')->with('success', 'Usuário criado com sucesso.');
@@ -61,35 +60,17 @@ class UserController extends Controller
 
   public function update(Request $request, User $user)
   {
-    $request->validate([
-      'nome' => 'required|string|max:255',
-      'cpf' => 'required|string|max:14|unique:users,cpf,' . $user->id,
-      'data_nascimento' => 'required|date',
-      'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-      'telefone' => 'required|string|max:15',
-      'cep' => 'required|string|max:9',
-      'estado' => 'required|string|max:2',
-      'cidade' => 'required|string|max:255',
-      'bairro' => 'required|string|max:255',
-      'endereco' => 'required|string|max:255',
-      'numero' => 'required|string|max:10',
-    ]);
+    try {
+      $request->validate(User::rules($user->id));
+      $dadosUsuario = $this->getUserDados($request);
+      $user->update($dadosUsuario);
 
-    $user->update([
-      'nome' => $request->nome,
-      'cpf' => $request->cpf,
-      'data_nascimento' => $request->data_nascimento,
-      'email' => $request->email,
-      'telefone' => $request->telefone,
-      'cep' => $request->cep,
-      'estado' => $request->estado,
-      'cidade' => $request->cidade,
-      'bairro' => $request->bairro,
-      'endereco' => $request->endereco,
-      'numero' => $request->numero,
-    ]);
-
-    return redirect()->route('users.index')->with('success', 'Usuário atualizado com sucesso.');
+      return redirect()->route('users.index')->with('success', 'Usuário atualizado com sucesso.');
+    } catch (\Illuminate\Validation\ValidationException $e) {
+      return redirect()->back()->withErrors($e->errors())->withInput();
+    } catch (\Exception $e) {
+      return redirect()->back()->withErrors(['error' => 'Erro ao atualizar usuário: ' . $e->getMessage()])->withInput();
+    }
   }
 
   public function destroy(User $user)
@@ -99,6 +80,23 @@ class UserController extends Controller
     $user->delete();
 
     return redirect()->route('users.index')->with('success', 'Usuário excluído com sucesso.');
+  }
+
+  private function getUserDados(Request $request)
+  {
+    return [
+      'nome' => $request->nome,
+      'cpf' => $request->cpf,
+      'data_nascimento' => User::transformDate($request->data_nascimento),
+      'email' => $request->email,
+      'telefone' => $request->telefone,
+      'cep' => $request->cep,
+      'estado' => $request->estado,
+      'cidade' => $request->cidade,
+      'bairro' => $request->bairro,
+      'endereco' => $request->endereco,
+      'numero' => $request->numero,
+    ];
   }
 
   private function getEstados()

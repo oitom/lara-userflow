@@ -30,9 +30,9 @@
       <input type="text" id="cpf" name="cpf" class="form-control" required maxlength="14" value="{{ old('cpf', $user->cpf) }}">
     </div>
     <div class="form-group col-md-6">
-      <label for="data_nascimento">Data de Nascimento</label>
-      <input type="text" id="data_nascimento" name="data_nascimento" class="form-control" required
-        placeholder="dd/mm/yyyy" maxlength="10" value="{{ old('data_nascimento', $user->data_nascimento) }}">
+        <label for="data_nascimento">Data de Nascimento</label>
+        <input type="text" id="data_nascimento" name="data_nascimento" class="form-control" required
+            placeholder="dd/mm/yyyy" maxlength="10" value="{{ old('data_nascimento', \Carbon\Carbon::parse($user->data_nascimento)->format('d/m/Y')) }}">
     </div>
   </div>
 
