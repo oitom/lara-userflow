@@ -55,3 +55,18 @@ docker exec lara_docker_app php artisan migrate --seed
 ```bash
 docker-compose down
 ```
+
+## Screenshot App
+![Tela Inicial](public/img/home.png)
+
+![Lista de usuários](public/img/lista-usuario.png)
+
+![Modal usuário](public/img/lista-usuario-modal.png)
+
+![Novo usuário](public/img/novo-usuario.png)
+
+![Editar usuário](public/img/editar-usuario.png)
+
+![Banco de dados](public/img/banco-de-dados.png)
+
+![Docker](public/img/docker.png)
