@@ -10,22 +10,25 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    public function index()
-    {
-        $totalUsers = User::count();
-        $usersByState = User::select('estado',
-                            DB::raw('count(*) as total'))
-                                ->groupBy('estado')
-                                ->pluck('total', 'estado');
+  public function index()
+  {
+    $totalUsers = User::count();
 
-        $averageAge = User::all()->avg(function($user) {
-            return Carbon::parse($user->data_nascimento)->age;
-        });
+    // Obtém o top 3 estados com mais usuários
+    $usersByState = User::select('estado', DB::raw('count(*) as total'))
+      ->groupBy('estado')
+      ->orderBy('total', 'desc')
+      ->take(3)
+      ->pluck('total', 'estado');
 
-        return view('home', [
-            'totalUsers' => $totalUsers,
-            'usersByState' => $usersByState,
-            'averageAge' => round($averageAge),
-        ]);
-    }
+    $averageAge = User::all()->avg(function ($user) {
+      return Carbon::parse($user->data_nascimento)->age;
+    });
+
+    return view('home', [
+      'totalUsers' => $totalUsers,
+      'usersByState' => $usersByState,
+      'averageAge' => round($averageAge),
+    ]);
+  }
 }

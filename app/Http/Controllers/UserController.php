@@ -10,7 +10,7 @@ class UserController extends Controller
 {
   public function index(Request $request)
   {
-    $users =  $this->getUsers($request);
+    $users =  $this->getAllUsers($request);
     return view('users.index', compact('users'));
   }
 
@@ -97,6 +97,22 @@ class UserController extends Controller
 
   private function getUsers(Request $request)
   {
+    $page = $request->get('page', 1);
+    $query = $request->get('search');
+    $perPage = 10;
+
+    return User::query()
+      ->when($query, function ($query, $search) {
+          return $query->where('nome', 'like', "%{$search}%")
+              ->orWhere('cpf', 'like', "%{$search}%")
+              ->orWhere('email', 'like', "%{$search}%");
+      })
+      ->forPage($page, $perPage)
+      ->get();
+  }
+
+  private function getAllUsers(Request $request)
+  {
     $query = $request->get('search');
     return User::query()
       ->when($query, function ($query, $search) {
@@ -104,7 +120,7 @@ class UserController extends Controller
               ->orWhere('cpf', 'like', "%{$search}%")
               ->orWhere('email', 'like', "%{$search}%");
       })
-      ->get();
+      ->paginate(10);
   }
 
   private function getUserDados(Request $request)

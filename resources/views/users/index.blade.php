@@ -26,7 +26,7 @@
     </button>
     </div>
     <div class="col-auto">
-      <a href="{{ route('users.exportCsv', ['search' => request()->get('search')]) }}" class="btn btn-secondary">
+      <a href="{{ route('users.exportCsv', ['search' => request()->get('search'), 'page' => request()->get('page')]) }}" class="btn btn-secondary">
         <i class="fas fa-file-csv"></i>
         Exportar
       </a>
@@ -36,6 +36,10 @@
 
 <div id="userTableContainer" class="table-responsive">
   @include('users.table')
+</div>
+
+<div class="d-flex justify-content-center mt-4">
+  {{ $users->appends(request()->query())->links('pagination::bootstrap-4') }}
 </div>
 
 <!-- Modal -->
