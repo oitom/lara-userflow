@@ -47,7 +47,7 @@ docker logs lara_docker_app
 docker exec lara_docker_app php artisan migrate --seed
 ```
 
-6. O projeto estará acessível em [http://localhost:8080](http://localhost:8080).
+6. O projeto estará acessível em [http://localhost:8000](http://localhost:8080).
 
 
 7. Para parar os contêineres, execute:
