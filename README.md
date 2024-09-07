@@ -67,6 +67,6 @@ docker-compose down
 
 ![Editar usuário](public/img/editar-usuario.png)
 
-![Banco de dados](public/img/banco-de-dados.png)
+![Banco de dados](public/img/bd.png)
 
 ![Docker](public/img/docker.png)
