@@ -3,24 +3,38 @@
 @section('title', 'Lista de Usuários')
 
 @section('content')
-<h1 class="text-center mb-4">Lista de Usuários</h1>
+<h1 class="text-center mb-4">Usuários</h1>
 
-
-<!-- Botão de Adicionar Usuário -->
-<div class="mb-3">
-  <a href="{{ route('users.create') }}" class="btn btn-primary">Adicionar Usuário</a>
+<div class="d-flex mb-4">
+  <div class="ml-auto">
+    <a href="{{ route('users.create') }}" class="btn btn-success">
+      <i class="fas fa-plus"></i>
+      Cadastrar
+    </a>
+  </div>
 </div>
 
-<!-- Barra de Pesquisa -->
-<form id="searchForm" class="mb-4">
-  <div class="form-group">
-    <input type="text" id="searchInput" name="search" class="form-control" placeholder="Buscar por nome, CPF, email..."
-      value="{{ request('search') }}">
+<form id="searchForm" class="mb-4" method="GET" action="{{ route('users.index') }}">
+  <div class="form-row align-items-center">
+    <div class="col">
+      <input type="text" id="searchInput" name="search" class="form-control" placeholder="Buscar por nome, CPF, email..."
+        value="{{ request('search') }}">
+    </div>
+    <div class="col-auto">
+    <button type="submit" class="btn btn-primary">
+      <i class="fas fa-search"></i>
+    </button>
+    </div>
+    <div class="col-auto">
+      <a href="{{ route('users.exportCsv', ['search' => request()->get('search')]) }}" class="btn btn-secondary">
+        <i class="fas fa-file-csv"></i>
+        Exportar
+      </a>
+    </div>
   </div>
 </form>
 
 <div id="userTableContainer" class="table-responsive">
-  <!-- Inclui a tabela de usuários -->
   @include('users.table')
 </div>
 
@@ -60,7 +74,6 @@
         </dl>
       </div>
       <div class="modal-footer">
-        <!-- Botões de Ação no Modal -->
         <a href="#" id="modal-edit-link" class="btn btn-warning">Editar</a>
         <form action="#" id="modal-delete-form" method="POST" style="display: inline;">
           @csrf
@@ -76,16 +89,10 @@
 
 <script>
   $(document).ready(function () {
-    $('#searchInput').on('input', function () {
-      var searchQuery = $(this).val();
-      fetchUsers(searchQuery);
-    });
-
     $('#viewUserModal').on('show.bs.modal', function (event) {
-      var button = $(event.relatedTarget); // Botão que acionou o modal
+      var button = $(event.relatedTarget);
       var modal = $(this);
 
-      // Preencher o modal com os dados do usuário
       modal.find('#modal-nome').text(button.data('nome'));
       modal.find('#modal-cpf').text(button.data('cpf'));
       modal.find('#modal-data_nascimento').text(button.data('data_nascimento'));
@@ -97,24 +104,9 @@
       modal.find('#modal-cep').text(button.data('cep'));
       modal.find('#modal-estado').text(button.data('estado'));
 
-      // Configurar o link e o formulário de exclusão no modal
       modal.find('#modal-edit-link').attr('href', '/users/' + button.data('id') + '/edit');
       modal.find('#modal-delete-form').attr('action', '/users/' + button.data('id'));
     });
   });
-
-  function fetchUsers(query) {
-    $.ajax({
-      url: "{{ route('users.index') }}",
-      type: "GET",
-      data: { search: query },
-      success: function (response) {
-        $('#userTableContainer').html(response);
-      },
-      error: function () {
-        alert('Erro ao buscar usuários.');
-      }
-    });
-  }
 </script>
 @endsection

@@ -4,24 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class UserController extends Controller
 {
   public function index(Request $request)
   {
-    $query = $request->get('search');
-    $users = User::query()
-      ->when($query, function ($query, $search) {
-        return $query->where('nome', 'like', "%{$search}%")
-          ->orWhere('cpf', 'like', "%{$search}%")
-          ->orWhere('email', 'like', "%{$search}%");
-        })
-      ->get();
-
-    if ($request->ajax()) {
-      return view('users.table', compact('users'));
-    }
-
+    $users =  $this->getUsers($request);
     return view('users.index', compact('users'));
   }
 
@@ -80,6 +69,42 @@ class UserController extends Controller
     $user->delete();
 
     return redirect()->route('users.index')->with('success', 'Usuário excluído com sucesso.');
+  }
+
+  public function exportCsv(Request $request)
+  {
+    $users = $this->getUsers($request);
+    $response = new StreamedResponse(function () use ($users) {
+        $handle = fopen('php://output', 'w');
+        $model = new User();
+        $headers = $model->getFillable();
+        fputcsv($handle, $headers);
+
+        foreach ($users as $user) {
+            $data = array_map(function ($field) use ($user) {
+                return $user->$field;
+            }, $headers);
+            fputcsv($handle, $data);
+        }
+        fclose($handle);
+    });
+
+    $response->headers->set('Content-Type', 'text/csv');
+    $response->headers->set('Content-Disposition', 'attachment; filename="users.csv"');
+
+    return $response;
+  }
+
+  private function getUsers(Request $request)
+  {
+    $query = $request->get('search');
+    return User::query()
+      ->when($query, function ($query, $search) {
+          return $query->where('nome', 'like', "%{$search}%")
+              ->orWhere('cpf', 'like', "%{$search}%")
+              ->orWhere('email', 'like', "%{$search}%");
+      })
+      ->get();
   }
 
   private function getUserDados(Request $request)
