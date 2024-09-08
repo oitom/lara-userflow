@@ -30,6 +30,9 @@ COPY . .
 # Copiar o script de entrypoint
 COPY entrypoint.sh /entrypoint.sh
 
+# Garantir permissões corretas para o entrypoint
+RUN chmod +x /entrypoint.sh
+
 # Expor a porta
 EXPOSE 9000
 

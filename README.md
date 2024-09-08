@@ -37,7 +37,7 @@ docker-compose up -d
 Se ao acessar a URL do projeto você receber o erro `502 Bad Gateway`, isso indica que o framework ainda está sendo instalado. 
 Esse processo pode levar até 3 minutos.
 Para acompanhar o progresso da instalação, utilize o comando:
-```
+```bash
 docker logs lara_docker_app
 ```
 A aplicação estará pronta quando a mensagem NOTICE: ready to handle connections for exibida.
