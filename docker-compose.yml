@@ -19,6 +19,7 @@ services:
       - PHP_MEMORY_LIMIT=4G
     ports:
       - "9000:9000"
+    command: bash -c "composer install --no-dev --optimize-autoloader --no-interaction && php-fpm"
 
   webserver:
     image: nginx:alpine

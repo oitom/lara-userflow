@@ -1,3 +1,4 @@
+# Usar a imagem base do PHP com FPM
 FROM php:8.1-fpm
 
 # Instalar dependências do sistema
@@ -17,24 +18,16 @@ RUN apt-get update && apt-get install -y \
 # Instalar Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Configurar diretório de trabalho
+# Definir o diretório de trabalho
 WORKDIR /var/www
 
-RUN mkdir -p /var/www/html/storage/logs && \
-    chown -R www-data:www-data /var/www/html/storage && \
-    chmod -R 775 /var/www/html/storage
-
-# Copiar arquivos para o contêiner
+# Copiar os arquivos do projeto para o container
 COPY . .
 
-# Copiar o script de entrypoint
-COPY entrypoint.sh /entrypoint.sh
-
-# Garantir permissões corretas para o entrypoint
-RUN chmod +x /entrypoint.sh
+# Configurar permissões para a pasta storage
+RUN mkdir -p /var/www/storage && \
+    chown -R www-data:www-data /var/www/storage && \
+    chmod -R 775 /var/www/storage
 
 # Expor a porta
 EXPOSE 9000
-
-# Configurar entrypoint
-ENTRYPOINT ["/entrypoint.sh"]
