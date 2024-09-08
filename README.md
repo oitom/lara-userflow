@@ -32,25 +32,20 @@ cd lara-userflow
 docker-compose up -d
 ```
 
-4. Aguarde alguns segundos até os seviços ficarem prontos.
-```
-Isso pode levar até 3 minutos.
-```
-Você pode ver o progresso da instalação usando o comando abaixo:
+4. Aguarde alguns instantes até que os serviços estejam prontos.
+
+Se ao acessar a URL do projeto você receber o erro `502 Bad Gateway`, isso indica que o framework ainda está sendo instalado. 
+Esse processo pode levar até 3 minutos.
+Para acompanhar o progresso da instalação, utilize o comando:
 ```
 docker logs lara_docker_app
 ```
-
-5. Execute as migrations necessárias para construir os dados da aplicação:
-
-```
-docker exec lara_docker_app php artisan migrate --seed
-```
-
-6. O projeto estará acessível em [http://localhost:8000](http://localhost:8080).
+A aplicação estará pronta quando a mensagem NOTICE: ready to handle connections for exibida.
 
 
-7. Para parar os contêineres, execute:
+5. O projeto estará acessível em [http://localhost:8000](http://localhost:8000).
+
+6. Para parar os contêineres, execute:
 
 ```bash
 docker-compose down
